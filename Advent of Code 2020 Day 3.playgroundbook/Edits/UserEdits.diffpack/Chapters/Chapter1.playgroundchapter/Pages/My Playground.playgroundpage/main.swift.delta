@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Diff</key>
+	<array>
+		<dict>
+			<key>ModifiedContent</key>
+			<string>import Foundation
+
+func countTrees(in data: [String], rightStep: Int, downStep: Int) -&gt; Int {
+    var result = 0
+    var row = 0
+    var column = 0
+    
+    while(row &lt; data.count) {
+        if data[row][String.Index(encodedOffset: column)] == "#" {
+            result += 1
+        }
+        
+        column += rightStep
+        if (column &gt;= data[row].count) {
+            column -= data[row].count
+        }
+        
+        row += downStep
+    }
+    
+    return result
+}
+
+var data = try String(contentsOf: #fileLiteral(resourceName: "Data.txt")).split(separator: "\n").map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+
+// MARK: Puzzle 1
+print(countTrees(in: data, rightStep: 3, downStep: 1))
+    
+// MARK: Puzzle 2
+let results = [
+    countTrees(in: data, rightStep: 1, downStep: 1),
+    countTrees(in: data, rightStep: 3, downStep: 1),
+    countTrees(in: data, rightStep: 5, downStep: 1),
+    countTrees(in: data, rightStep: 7, downStep: 1),
+    countTrees(in: data, rightStep: 1, downStep: 2)
+]
+
+print(results.reduce(1, { $0 * $1 }))
+</string>
+			<key>ModifiedRange</key>
+			<string>{0, 1049}</string>
+			<key>OriginalContent</key>
+			<string>
+</string>
+			<key>OriginalRange</key>
+			<string>{0, 1}</string>
+		</dict>
+	</array>
+	<key>File</key>
+	<string>Chapters/Chapter1.playgroundchapter/Pages/My Playground.playgroundpage/main.swift</string>
+</dict>
+</plist>
