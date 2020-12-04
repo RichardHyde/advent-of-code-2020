@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Diff</key>
+	<array>
+		<dict>
+			<key>ModifiedContent</key>
+			<string>import Foundation
+
+enum PassportError: Error {
+    case invalidData(String)
+    case unknownField(String)
+}
+
+/*
+ byr (Birth Year)
+ iyr (Issue Year)
+ eyr (Expiration Year)
+ hgt (Height)
+ hcl (Hair Color)
+ ecl (Eye Color)
+ pid (Passport ID)
+ cid (Country ID)
+*/
+
+struct Passport {
+    var birthYear: Int? = nil
+    var issueYear: Int? = nil
+    var expirationYear: Int? = nil
+    var height: String? = nil
+    var hairColour: String? = nil
+    var eyeColour: String? = nil
+    var passportID: String? = nil
+    var countryID: String? = nil
+    
+    init(data: [String]) throws {
+        try data.forEach {
+            guard let colonIndex = $0.firstIndex(of: ":") else {
+                throw PassportError.invalidData($0)
+            }
+            let field = String($0[...colonIndex])
+            let dataIndex = $0.index(colonIndex, offsetBy: 1)
+            switch(field) {
+            case "byr:":
+                self.birthYear = Int(String($0[dataIndex...]))
+            case "iyr:":
+                self.issueYear = Int(String($0[dataIndex...]))
+            case "eyr:":
+                self.expirationYear = Int(String($0[dataIndex...]))
+            case "hgt:":
+                self.height = String($0[dataIndex...])
+            case "hcl:":
+                self.hairColour = String($0[dataIndex...])
+            case "ecl:":
+                self.eyeColour = String($0[dataIndex...])
+            case "pid:":
+                self.passportID = String($0[dataIndex...])
+            case "cid:":
+                self.countryID = String($0[dataIndex...])
+            default:
+                throw PassportError.unknownField(field)
+            }
+        }
+    }
+    
+    func hasRequiredFields() -&gt; Bool {
+        return self.issueYear != nil &amp;&amp; self.expirationYear != nil &amp;&amp; self.birthYear != nil &amp;&amp; self.eyeColour != nil &amp;&amp; self.hairColour != nil &amp;&amp; self.height != nil &amp;&amp; self.passportID != nil
+    }
+    
+    func isValid() -&gt; Bool {
+        return self.hasRequiredFields() &amp;&amp; self.isValidBirthYear() &amp;&amp; self.isValidIssueYear() &amp;&amp; self.isValidExpirationYear() &amp;&amp; self.isValidHeight() &amp;&amp; self.isValidHairColour() &amp;&amp; self.isValidEyeColour() &amp;&amp; self.isValidPassportID()
+    }
+    
+    func isValidBirthYear() -&gt; Bool {
+        return self.isValidYear(year: self.birthYear, minYear: 1920, maxYear: 2002)
+    }
+    
+    func isValidIssueYear() -&gt; Bool {
+        return self.isValidYear(year: self.issueYear, minYear: 2010, maxYear: 2020)
+    }
+    
+    func isValidExpirationYear() -&gt; Bool {
+        return self.isValidYear(year: self.expirationYear, minYear: 2020, maxYear: 2030)
+    }
+    
+    func isValidHeight() -&gt; Bool {
+        guard let height = self.height else { return false }
+        
+        if height.hasSuffix("cm") {
+            guard let heightMeasure = Int(height[..&lt;height.index(height.endIndex, offsetBy: -2)]) else { return false }
+            return heightMeasure &gt;= 150 &amp;&amp; heightMeasure &lt;= 193
+        } else if height.hasSuffix("in") {
+            guard let heightMeasure = Int(height[..&lt;height.index(height.endIndex, offsetBy: -2)]) else { return false }
+            return heightMeasure &gt;= 59 &amp;&amp; heightMeasure &lt;= 76
+        }
+        
+        return false
+    }
+    
+    func isValidHairColour() -&gt; Bool {
+        guard var hairColour = self.hairColour else { return false }
+        guard hairColour.hasPrefix("#") &amp;&amp; hairColour.count == 7 else { return false }
+        hairColour = String(hairColour.dropFirst())
+        
+        return try hairColour.allSatisfy({ $0.isHexDigit &amp;&amp; ($0.isNumber || $0.isLowercase) })
+    }
+    
+    func isValidEyeColour() -&gt; Bool {
+        guard let eyeColour = self.eyeColour else { return false }
+        
+        return ["amb","blu","brn","gry","grn","hzl","oth"].contains(eyeColour)
+    }
+    
+    func isValidPassportID() -&gt; Bool {
+        guard var passportID = self.passportID else { return false }
+        guard passportID.count == 9 else { return false }
+        
+        return try passportID.allSatisfy({ $0.isNumber })
+    }
+    
+    private func isValidYear(year: Int?, minYear: Int, maxYear: Int) -&gt; Bool {
+        guard let year = year else { return false }
+        return year &gt;= minYear &amp;&amp; year &lt;= maxYear
+    }
+}
+
+let data = try String(contentsOf: #fileLiteral(resourceName: "Passports.txt"))
+let passports = try data.components(separatedBy: "\n\n").map( { try Passport(data: $0.components(separatedBy: .whitespacesAndNewlines))} )
+
+// MARK: Puzzle 1 - count of passports with all the required fields
+print(passports.filter({ $0.hasRequiredFields() }).count)
+
+// MARK: Puzzle 2 - count of passports with all valid fields
+print(passports.filter({ $0.isValid() }).count)
+</string>
+			<key>ModifiedRange</key>
+			<string>{0, 4649}</string>
+			<key>OriginalContent</key>
+			<string>
+</string>
+			<key>OriginalRange</key>
+			<string>{0, 1}</string>
+		</dict>
+	</array>
+	<key>File</key>
+	<string>Chapters/Chapter1.playgroundchapter/Pages/My Playground.playgroundpage/main.swift</string>
+</dict>
+</plist>
