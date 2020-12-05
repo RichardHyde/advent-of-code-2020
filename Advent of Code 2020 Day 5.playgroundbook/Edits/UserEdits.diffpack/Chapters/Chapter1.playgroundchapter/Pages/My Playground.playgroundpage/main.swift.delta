@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Diff</key>
+	<array>
+		<dict>
+			<key>ModifiedContent</key>
+			<string>import Foundation
+
+struct BoardingPass {
+    let row: Int
+    let column: Int
+    let seatID: Int
+    
+    init(data: String) {
+        let rowData = data.dropLast(3)
+        let columnData = data.dropFirst(7)
+        
+        var rowMinMax = [0,127]
+        rowData.forEach { char in
+            var diff = Int((Float(rowMinMax[1]-rowMinMax[0])/2).rounded())
+            if char == "F" {
+                rowMinMax[1] -= diff
+            } else {
+                rowMinMax[0] += diff
+            }
+        }
+        self.row = rowMinMax[0]
+        
+        var columnMinMax = [0,7]
+        columnData.forEach { char in
+            var diff = Int((Float(columnMinMax[1]-columnMinMax[0])/2).rounded())
+            if char == "L" {
+                columnMinMax[1] -= diff
+            } else {
+                columnMinMax[0] += diff
+            }
+        }
+        self.column = columnMinMax[0]
+        
+        self.seatID = (self.row * 8) + self.column
+    }
+}
+
+let boardingPasses = try String(contentsOf: #fileLiteral(resourceName: "BoardingPasses.txt")).components(separatedBy: .newlines).map { BoardingPass(data: $0) }.sorted(by: { $0.seatID &lt; $1.seatID })
+
+// MARK: Puzzle 1: Maximum seat id
+print(boardingPasses.last!.seatID)
+
+// MARK: Puzzle 2: Allocated seat I'd
+print(boardingPasses.reduce(90, { $0+1 == $1.seatID ? $1.seatID : $0 } )+1)
+
+</string>
+			<key>ModifiedRange</key>
+			<string>{1, 1346}</string>
+			<key>OriginalContent</key>
+			<string></string>
+			<key>OriginalRange</key>
+			<string>{1, 0}</string>
+		</dict>
+	</array>
+	<key>File</key>
+	<string>Chapters/Chapter1.playgroundchapter/Pages/My Playground.playgroundpage/main.swift</string>
+</dict>
+</plist>
