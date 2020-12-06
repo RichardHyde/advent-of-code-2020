@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Diff</key>
+	<array>
+		<dict>
+			<key>ModifiedContent</key>
+			<string>import Foundation
+
+struct Group {
+    let answers: [String]
+    
+    func yeses() -&gt; String {
+        answers.reduce("", { $1.reduce($0, { $0.contains($1) ? $0 : $0.appending(String($1)) } ) })
+    }
+    
+    func uniqueYeses() -&gt; String {
+        answers.dropFirst().reduce(answers.first!, { (result, answers) in
+            result.filter({ answers.contains($0) })
+        })
+    }
+}
+
+let groups = try String(contentsOf: #fileLiteral(resourceName: "Answers.txt")).components(separatedBy: "\n\n").map({ Group(answers: $0.components(separatedBy: "\n"))})
+
+// MARK: Puzzle 1 - Number of yeses in the group
+print(groups.reduce(0, { (result, group) in result+group.yeses().count } ))
+
+// MARK: Puzzle 2 - Number of question all in the group answered yes to
+print(groups.reduce(0, { (result, group) in result+group.uniqueYeses().count } ))
+</string>
+			<key>ModifiedRange</key>
+			<string>{0, 835}</string>
+			<key>OriginalContent</key>
+			<string>
+</string>
+			<key>OriginalRange</key>
+			<string>{0, 1}</string>
+		</dict>
+	</array>
+	<key>File</key>
+	<string>Chapters/Chapter1.playgroundchapter/Pages/My Playground.playgroundpage/main.swift</string>
+</dict>
+</plist>
