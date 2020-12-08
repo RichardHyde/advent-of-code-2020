@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Diff</key>
+	<array>
+		<dict>
+			<key>ModifiedContent</key>
+			<string>import Foundation
+
+struct BagRule: Hashable {
+    let colour: String
+    let quantity: Int
+}
+
+struct Bag: Hashable {
+    let colour: String
+    var bagRules: [BagRule]?
+    
+    init(ruleLine: String) {
+        let x = ruleLine.components(separatedBy: .whitespaces)
+        
+        self.colour = "\(x[0]) \(x[1])"
+        
+        var index = 4
+        guard x[index] != "no" else {
+            self.bagRules = nil
+            return
+        }
+        
+        self.bagRules = []
+        while index &lt; x.count {
+            self.bagRules?.append(BagRule(colour: "\(x[index+1]) \(x[index+2])", quantity: try (Int(x[index]) ?? 0)))
+            index+=4
+        }
+    }
+    
+}
+
+func findContainers(for bagColour: String, quantity: Int = 1, rules: [Bag]) -&gt; [Bag] {
+    var results = rules.filter({ ($0.bagRules?.contains { $0.colour == bagColour &amp;&amp; $0.quantity &gt;= quantity } ?? false) }) 
+    
+    results.append(contentsOf: results.flatMap({ findContainers(for: $0.colour, rules: rules) }))
+    
+    return Array(Set(results))
+}
+
+func noOfChildBags(for bagColour: String, rules: [Bag]) -&gt; Int {
+    guard let bag = rules.first(where: { $0.colour == bagColour }) else { return 0 }
+    
+    return bag.bagRules?.reduce(0, { $0 + $1.quantity + ($1.quantity * noOfChildBags(for: $1.colour, rules: rules)) }) ?? 0
+}
+
+let rules = try String(contentsOf: #fileLiteral(resourceName: "Rules.txt")).components(separatedBy: .newlines).map({ Bag(ruleLine: $0)})
+
+let bagColour = "shiny gold"
+print(findContainers(for: bagColour, rules: rules).count)
+
+if let bag = rules.first(where: { $0.colour == bagColour }) {
+    print(noOfChildBags(for: bagColour, rules: rules))
+}
+</string>
+			<key>ModifiedRange</key>
+			<string>{0, 1656}</string>
+			<key>OriginalContent</key>
+			<string>
+</string>
+			<key>OriginalRange</key>
+			<string>{0, 1}</string>
+		</dict>
+	</array>
+	<key>File</key>
+	<string>Chapters/Chapter1.playgroundchapter/Pages/My Playground.playgroundpage/main.swift</string>
+</dict>
+</plist>
