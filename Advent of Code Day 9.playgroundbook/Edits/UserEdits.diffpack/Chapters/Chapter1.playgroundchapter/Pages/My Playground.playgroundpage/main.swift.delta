@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Diff</key>
+	<array>
+		<dict>
+			<key>ModifiedContent</key>
+			<string>import Foundation
+
+struct XMASCypher {
+    let preambleLength: Int
+    let numbers: [Int]
+    
+    init(numbers: [Int], preambleLength: Int = 25) {
+        self.preambleLength = preambleLength
+        self.numbers = numbers
+    }
+    
+    func factors(number: Int, preamble: [Int]) -&gt; [Int] {
+        preamble.filter({ preamble.contains(number-$0) &amp;&amp; (number-$0) != $0 })
+    }
+    
+    func findRangeTotaling(start index: Int, target: Int) -&gt; [Int]? {
+        var c = 0
+        var total = 0
+        var range: [Int] = []
+        repeat {
+            range.append(self.numbers[index+c])
+            total += self.numbers[index+c]
+            c += 1
+        } while (index+c &lt; self.numbers.count &amp;&amp; total &lt; target)
+        
+        if total == target {
+            return range.sorted()
+        } else {
+            return nil
+        }
+    }
+    
+}
+
+let numbers = try String(contentsOf: #fileLiteral(resourceName: "XmasCypher.txt")).components(separatedBy: .newlines).compactMap({ Int($0) })
+
+let xmasCypher = XMASCypher(numbers: numbers)
+var target: Int = 0
+
+for index in (xmasCypher.preambleLength..&lt;xmasCypher.numbers.count ) { 
+    let number = xmasCypher.numbers[index]
+    if xmasCypher.factors(number: number, preamble: Array(xmasCypher.numbers[(index-xmasCypher.preambleLength)..&lt;index])).isEmpty {
+        target = number
+        print(number)
+        break
+    }
+}
+
+for index in 0..&lt;xmasCypher.numbers.count { 
+    if let range = xmasCypher.findRangeTotaling(start: index, target: target) {
+        print("\(range.first!) + \(range.last!) = \(range.first! + range.last!)")
+        break
+    }
+}
+</string>
+			<key>ModifiedRange</key>
+			<string>{0, 1606}</string>
+			<key>OriginalContent</key>
+			<string>
+</string>
+			<key>OriginalRange</key>
+			<string>{0, 1}</string>
+		</dict>
+	</array>
+	<key>File</key>
+	<string>Chapters/Chapter1.playgroundchapter/Pages/My Playground.playgroundpage/main.swift</string>
+</dict>
+</plist>
