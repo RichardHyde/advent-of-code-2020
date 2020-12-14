@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Diff</key>
+	<array>
+		<dict>
+			<key>ModifiedContent</key>
+			<string>import Foundation
+
+struct Processor {
+    enum Instruction {
+        case acc(Int)
+        case jmp(Int)
+        case nop(Int)
+        
+        static func Parse(_ instruction: String) throws -&gt; Instruction {
+            let instruction = instruction.components(separatedBy: .whitespaces)
+            
+            switch instruction[0] {
+            case "acc":
+                return Instruction.acc(try Int(instruction[1])!)
+            case "jmp":
+                return Instruction.jmp(try Int(instruction[1])!)
+            case "nop":
+                return Instruction.nop(try Int(instruction[1])!)
+            default:
+                break
+            }
+            
+            throw ProcessorError.unknowInstruction(instruction[0])
+        }
+        
+        static func IsSwappable(_ instruction: Instruction) -&gt; Bool {
+            switch instruction {
+            case .acc(let _):
+                return false
+            default:
+                return true
+            }
+        }
+    }
+    
+    enum ProcessorError: Error {
+        case infinateLoop(Int)
+        case unknowInstruction(String)
+        case unswappableInstruction(Instruction)
+    }
+    
+    var acc = 0
+    var instructions: [Instruction]
+    var stackTrace: [Int] = []
+    
+    init(instructions: [String]) throws {
+        self.instructions = try instructions.map({ try Instruction.Parse($0) })
+    }
+    
+    mutating func run() throws -&gt; Int {
+        var ip = 0
+        self.acc = 0
+        self.stackTrace.removeAll()
+        
+        while ip &lt; self.instructions.count {
+            stackTrace.append(ip)
+            
+            switch instructions[ip] {
+            case .acc(let val):
+                self.acc += val
+                ip += 1
+            case .jmp(let jmp):
+                if stackTrace.contains(ip + jmp) { throw ProcessorError.infinateLoop(ip) }
+                ip += jmp
+            case .nop(let _):
+                ip += 1
+            default:
+                break
+            }
+        }
+        return self.acc
+    }
+    
+    mutating func switchInstruction(at ip: Int) throws {
+        switch self.instructions[ip] {
+        case .jmp(let jmp):
+            self.instructions[ip] = .nop(jmp)
+        case .nop(let jmp):
+            self.instructions[ip] = .jmp(jmp)
+        default:
+            throw Processor.ProcessorError.unswappableInstruction(self.instructions[ip])
+        }
+    }
+}
+
+let instructions = try String(contentsOf: #fileLiteral(resourceName: "Instructions.txt")).components(separatedBy: .newlines)
+var processor = try Processor(instructions: instructions)
+
+do {
+    _ = try processor.run()
+} catch Processor.ProcessorError.infinateLoop(let ip) {
+    print(processor.acc)
+} catch {
+    print(error)
+}
+
+var fixIP: Int?
+while (true) {
+    do {
+        let result = try processor.run()
+        print(result)
+        break
+    } catch Processor.ProcessorError.infinateLoop(let loopIP) {
+        if let ip = fixIP {
+            try processor.switchInstruction(at: ip)
+        } 
+        
+        if let i = processor.instructions.dropFirst((fixIP ?? -1)+1).firstIndex(where: { Processor.Instruction.IsSwappable($0) }) {
+            try processor.switchInstruction(at: i)
+            fixIP = i
+        } 
+    } catch {
+        throw error
+    }
+}
+</string>
+			<key>ModifiedRange</key>
+			<string>{0, 3275}</string>
+			<key>OriginalContent</key>
+			<string>
+</string>
+			<key>OriginalRange</key>
+			<string>{0, 1}</string>
+		</dict>
+	</array>
+	<key>File</key>
+	<string>Chapters/Chapter1.playgroundchapter/Pages/My Playground.playgroundpage/main.swift</string>
+</dict>
+</plist>
